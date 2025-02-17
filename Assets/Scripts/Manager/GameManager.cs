@@ -334,10 +334,10 @@ public class GameManager : MonoSingleton<GameManager>
     }
 
     public MusicManager musicManager;
-    private List<int> paiChiPlayer = new List<int> { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15 };
-    private List<int> paikuChiBoss = new List<int> { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15 };
+    private List<int> paiChiPlayer = new List<int> { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15 };
+    private List<int> paikuChiBoss = new List<int> { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15 };
     private List<GameObject> paichiPlayerObj = new List<GameObject>();
-    private List<int> randomElements;
+    private List<GameObject> randomElements;
 
     private List<int> paikuPlayer = new List<int>();
     private List<int> paikuBoss = new List<int>();
@@ -365,6 +365,7 @@ public class GameManager : MonoSingleton<GameManager>
     private GameObject gamePanel;               //游戏panel节点
     public GameObject xuanpaiPanel;             //选牌界面
     public GameObject beginPanel;               //游戏开始界面
+    private int gameState = 0;                  //游戏阶段 0选牌阶段 1游戏阶段
     public void InitGame()
     {
         BeginPanel(true);
@@ -413,41 +414,86 @@ public class GameManager : MonoSingleton<GameManager>
 
         BeginPanel(true);
     }
-    public void XuanPaiBegin()
+    public void XuanPaiBegin(bool isBool = true)
     {
-        xuanpaiPanel.SetActive(true);
-        // 实例化所有牌
-        for (int i = 0; i < paiChiPlayer.Count; i++)
+        if (isBool)
         {
-            CardInfoCfg cfg = configMag.GetCardInfoCfgByKey(paiChiPlayer[i]);
-            CardInfo cardInfo = new CardInfo();
-            cardInfo.addId = i;
-            cardInfo.id = cfg.ID;
-            cardInfo.xjNumber = cfg.xjNumber;
-            cardInfo.hpNumber = cfg.hpNumber;
-            cardInfo.gjNumber = cfg.gjNumber;
-            cardInfo.hpNumberNow = cfg.hpNumber;
-            cardInfo.gjNumberNow = cfg.gjNumber;
-            cardInfo.name = cfg.name;
-            cardInfo.type = cfg.type;
-            cardInfo.imageId = cfg.imageId;
-            cardInfo.state = 0;
-            var obj = AddPrefab("ShouCard", xuanpaiPanel.transform.Find("List2/Viewport/Content"));
-            obj.GetComponent<ShouCard>().InitCardInfo(cardInfo);
-            paichiPlayerObj.Add(obj);
+            xuanpaiPanel.SetActive(true);
+            // 实例化所有牌
+            for (int i = 0; i < paiChiPlayer.Count; i++)
+            {
+                CardInfoCfg cfg = configMag.GetCardInfoCfgByKey(paiChiPlayer[i]);
+                CardInfo cardInfo = new CardInfo();
+                cardInfo.addId = i;
+                cardInfo.id = cfg.ID;
+                cardInfo.xjNumber = cfg.xjNumber;
+                cardInfo.hpNumber = cfg.hpNumber;
+                cardInfo.gjNumber = cfg.gjNumber;
+                cardInfo.hpNumberNow = cfg.hpNumber;
+                cardInfo.gjNumberNow = cfg.gjNumber;
+                cardInfo.name = cfg.name;
+                cardInfo.type = cfg.type;
+                cardInfo.imageId = cfg.imageId;
+                cardInfo.state = 0;
+                var obj = AddPrefab("ShouCard", xuanpaiPanel.transform.Find("List2/Viewport/Content"));
+                obj.GetComponent<ShouCard>().InitCardInfo(cardInfo);
+                paichiPlayerObj.Add(obj);
+            }
         }
+        
         // 随机取出3个元素并从原列表删除
-        randomElements = Util.TakeAndRemoveRandomElements(paiChiPlayer, 3);
+        randomElements = RandCardObj(paichiPlayerObj, 3);
         //改变父对象
         for (int i = 0; i < randomElements.Count; i++)
         {
-            paichiPlayerObj[randomElements[i]].transform.SetParent(xuanpaiPanel.transform.Find("List1/Viewport/Content"));
+            randomElements[i].transform.SetParent(xuanpaiPanel.transform.Find("List1/Viewport/Content"));
         }
 
+    }
+    public List<GameObject> RandCardObj(List<GameObject> _list, int _number)
+    {
+        List<GameObject> result = new List<GameObject>();
+        if (_list.Count <= 0)
+        {
+            return result;
+        }
+
+        for (int i = 0; i < _number; i++)
+        {
+            int randIndex = Util.randomInt(0, _list.Count - 1);
+            result.Add(_list[randIndex]);
+            _list.RemoveAt(randIndex);
+            if (_list.Count <= 0)
+            {
+                return result;
+            }
+        }
+
+        return result;
+    }
+    public void XuanPaiCard(GameObject _obj)
+    {
+        //牌库加牌
+        paikuPlayer.Add(_obj.GetComponent<ShouCard>().GetCardInfo().id);
+        foreach (var item in randomElements)
+        {
+            Destroy(item);
+        }
+        if (paichiPlayerObj.Count > 0)
+        {
+            XuanPaiBegin(false);
+        }
+        else
+        {
+            Debug.Log("开始游戏");
+            BeginGame();
+        }
     }
     //开始游戏
     public void BeginGame()
     {
+        gameState = 1;
+        xuanpaiPanel.SetActive(false);
         BeginPanel(false);
         //初始化牌组
         InitCard();
@@ -958,6 +1004,11 @@ public class GameManager : MonoSingleton<GameManager>
     //攻击
     public void Attack(GameObject _obj)
     {
+        if (gameState == 0)
+        {
+            XuanPaiCard(_obj);
+            return;
+        }
         var info = _obj.GetComponent<ShouCard>().GetCardInfo();
         if (info.state == 5)
         {
@@ -1055,6 +1106,17 @@ public class GameManager : MonoSingleton<GameManager>
     {
         var obj = AddPrefab("gj", _trs);
 
+    }
+    // 退出游戏的方法
+    public void Quit()
+    {
+#if UNITY_EDITOR
+        // 在 Unity 编辑器中，使用 UnityEditor.EditorApplication.isPlaying 属性来停止播放
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        // 在发布的应用程序中，使用 Application.Quit() 方法来退出游戏
+        Application.Quit();
+#endif
     }
 }
 
