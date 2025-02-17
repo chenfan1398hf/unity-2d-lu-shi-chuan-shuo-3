@@ -125,3 +125,8 @@ public class CardPlayManager
     }
   
 }
+public class CardTxAndId
+{
+    public int id;
+    public int txState;
+}

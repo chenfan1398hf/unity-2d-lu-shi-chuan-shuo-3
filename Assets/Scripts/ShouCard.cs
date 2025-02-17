@@ -12,6 +12,7 @@ public class ShouCard : MonoBehaviour
     private Text xjText;
     private GameObject huiObj;
     private Image bg;
+    private Image txImage;
     private Text xText;
     private bool isNuType = false;
     private bool isAiType = false;
@@ -34,6 +35,7 @@ public class ShouCard : MonoBehaviour
         xjText = this.transform.Find("Image_xj/Text (Legacy)").GetComponent<Text>();
         xText = this.transform.Find("Text").GetComponent<Text>();
         cardImage = this.transform.Find("Image_pai").GetComponent<Image>();
+        txImage = this.transform.Find("Image_tx").GetComponent<Image>();
         huiObj = this.transform.Find("ImageB").gameObject;
         bg = this.gameObject.GetComponent<Image>();
         info = _info;
@@ -52,6 +54,7 @@ public class ShouCard : MonoBehaviour
         hpText.text = info.hpNumberNow.ToString();
         xjText.text = info.xjNumber.ToString();
         GameManager.instance.SpritPropImageByPath("KaPai/"+ info.imageId, cardImage);
+        UpateTxImage();
         UpdateXjType();
         UpdateCardBack();
 
@@ -62,10 +65,20 @@ public class ShouCard : MonoBehaviour
         if (info.state == 4)
         {
             huiObj.SetActive(true);
+
         }
         else
         {
             huiObj.SetActive(false);
+
+        }
+        if (info.state == 4)
+        {
+            this.transform.Find("Image_tx").gameObject.SetActive(false);
+        }
+        else if (info.state == 6)
+        {
+            this.transform.Find("Image_tx").gameObject.SetActive(true);
         }
     }
     //玩家拖动牌
@@ -229,6 +242,19 @@ public class ShouCard : MonoBehaviour
     {
         isLeType = true;
 
+    }
+    //刷新特效
+    public void UpateTxImage()
+    {
+        if (info.txState == 0)
+        {
+            txImage.gameObject.SetActive(false);
+        }
+        else
+        {
+            txImage.gameObject.SetActive(true);
+        }
+        GameManager.instance.SpritPropImageByPath("Tex/"+info.txState.ToString(), txImage);
     }
 
 }

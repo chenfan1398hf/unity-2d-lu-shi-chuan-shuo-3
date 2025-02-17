@@ -67,6 +67,6 @@ public class CardInfo
     public int state = 0;               //1玩家牌组2BOSS牌组3玩家手牌4BOSS手牌5玩家场牌6BOSS场牌7玩家8BOSS
     public int liveHh = 0;              //存在回合数 
     public int attackNumber = 0;        //剩余攻击次数
-
+    public int txState = 0;             //特效 1嘲讽2复生3吸血4圣盾
 }
 

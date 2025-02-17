@@ -20,7 +20,7 @@ public class GameManager : MonoSingleton<GameManager>
     public static bool isDbugLog = true;
     public PlayerData playerData = null;                            //玩家数据（本地持久化）
     public ConfigManager configMag;
-    private System.Random Random;                                   //随机种子
+    private System.Random Random1;                                   //随机种子
     private int TimeNumber = 0;
     private List<UnityAction> unityActionList = new List<UnityAction>();
     public bool isBattle = true;
@@ -44,7 +44,7 @@ public class GameManager : MonoSingleton<GameManager>
         DontDestroyOnLoad(gameObject);
         Application.targetFrameRate = 60;//设置帧率为60帧
         GetLocalPlayerData();
-        Random = new System.Random(Guid.NewGuid().GetHashCode());
+        Random1 = new System.Random(Guid.NewGuid().GetHashCode());
     }
     #endregion
 
@@ -337,10 +337,13 @@ public class GameManager : MonoSingleton<GameManager>
     private List<int> paiChiPlayer = new List<int> { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15 };
     private List<int> paikuChiBoss = new List<int> { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15 };
     private List<GameObject> paichiPlayerObj = new List<GameObject>();
+    private List<GameObject> paichiBossObj = new List<GameObject>();
     private List<GameObject> randomElements;
 
-    private List<int> paikuPlayer = new List<int>();
-    private List<int> paikuBoss = new List<int>();
+
+
+    private List<CardTxAndId> paikuPlayer = new List<CardTxAndId>();
+    private List<CardTxAndId> paikuBoss = new List<CardTxAndId>();
 
     private List<CardInfo> bossCardList = new List<CardInfo>();             //boss牌组
     private List<CardInfo> playerCardList = new List<CardInfo>();           //玩家牌组
@@ -419,6 +422,7 @@ public class GameManager : MonoSingleton<GameManager>
         if (isBool)
         {
             xuanpaiPanel.SetActive(true);
+            BossXuanPai();
             // 实例化所有牌
             for (int i = 0; i < paiChiPlayer.Count; i++)
             {
@@ -439,8 +443,32 @@ public class GameManager : MonoSingleton<GameManager>
                 obj.GetComponent<ShouCard>().InitCardInfo(cardInfo);
                 paichiPlayerObj.Add(obj);
             }
+            //随机特效
+            List<GameObject> random60 = GetRandomElements(60);
+            for (int i = 0; i < random60.Count; i++)
+            {
+                if (i < 15)
+                {
+                    random60[i].GetComponent<ShouCard>().GetCardInfo().txState = 1;
+                    Debug.Log(random60[i].GetComponent<ShouCard>().GetCardInfo().addId);
+                }
+                else if (i < 30)
+                {
+                    random60[i].GetComponent<ShouCard>().GetCardInfo().txState = 2;
+                }
+                else if (i < 45)
+                {
+                    random60[i].GetComponent<ShouCard>().GetCardInfo().txState = 3;
+                }
+                else if (i < 60)
+                {
+                    random60[i].GetComponent<ShouCard>().GetCardInfo().txState = 4;
+                }
+                random60[i].GetComponent<ShouCard>().UpateTxImage();
+            }
         }
-        
+
+       
         // 随机取出3个元素并从原列表删除
         randomElements = RandCardObj(paichiPlayerObj, 3);
         //改变父对象
@@ -474,7 +502,10 @@ public class GameManager : MonoSingleton<GameManager>
     public void XuanPaiCard(GameObject _obj)
     {
         //牌库加牌
-        paikuPlayer.Add(_obj.GetComponent<ShouCard>().GetCardInfo().id);
+        CardTxAndId cardTxAndId = new CardTxAndId();
+        cardTxAndId.id = _obj.GetComponent<ShouCard>().GetCardInfo().id;
+        cardTxAndId.txState = _obj.GetComponent<ShouCard>().GetCardInfo().txState;
+        paikuPlayer.Add(cardTxAndId);
         foreach (var item in randomElements)
         {
             Destroy(item);
@@ -488,6 +519,122 @@ public class GameManager : MonoSingleton<GameManager>
             Debug.Log("开始游戏");
             BeginGame();
         }
+    }
+    //随机特效
+    // 获取随机不重复元素的方法
+    public List<GameObject> GetRandomElements(int count)
+    {
+        // 检查合法性
+        if (paichiPlayerObj == null || paichiPlayerObj.Count < count)
+        {
+            Debug.LogError("列表为空或元素数量不足！");
+            return new List<GameObject>();
+        }
+
+        // 创建临时列表（避免修改原列表）
+        List<GameObject> tempList = new List<GameObject>(paichiPlayerObj);
+        List<GameObject> result = new List<GameObject>();
+
+        // Fisher-Yates 洗牌算法（部分洗牌，只洗到需要的数量）
+        for (int i = 0; i < count; i++)
+        {
+            int randomIndex = UnityEngine.Random.Range(i, tempList.Count);
+
+            // 交换元素位置
+            GameObject temp = tempList[i];
+            tempList[i] = tempList[randomIndex];
+            tempList[randomIndex] = temp;
+
+            // 将选中的元素加入结果
+            result.Add(tempList[i]);
+        }
+
+        return result;
+    }
+    public List<GameObject> GetRandomElementsBoss(int count)
+    {
+        // 检查合法性
+        if (paichiBossObj == null || paichiBossObj.Count < count)
+        {
+            Debug.LogError("列表为空或元素数量不足！");
+            return new List<GameObject>();
+        }
+
+        // 创建临时列表（避免修改原列表）
+        List<GameObject> tempList = new List<GameObject>(paichiBossObj);
+        List<GameObject> result = new List<GameObject>();
+
+        // Fisher-Yates 洗牌算法（部分洗牌，只洗到需要的数量）
+        for (int i = 0; i < count; i++)
+        {
+            int randomIndex = UnityEngine.Random.Range(i, tempList.Count);
+
+            // 交换元素位置
+            GameObject temp = tempList[i];
+            tempList[i] = tempList[randomIndex];
+            tempList[randomIndex] = temp;
+
+            // 将选中的元素加入结果
+            result.Add(tempList[i]);
+        }
+
+        return result;
+    }
+    //BOSS选牌
+    public void BossXuanPai()
+    {
+        // 实例化所有牌
+        for (int i = 0; i < paikuChiBoss.Count; i++)
+        {
+            CardInfoCfg cfg = configMag.GetCardInfoCfgByKey(paikuChiBoss[i]);
+            CardInfo cardInfo = new CardInfo();
+            cardInfo.addId = i;
+            cardInfo.id = cfg.ID;
+            cardInfo.xjNumber = cfg.xjNumber;
+            cardInfo.hpNumber = cfg.hpNumber;
+            cardInfo.gjNumber = cfg.gjNumber;
+            cardInfo.hpNumberNow = cfg.hpNumber;
+            cardInfo.gjNumberNow = cfg.gjNumber;
+            cardInfo.name = cfg.name;
+            cardInfo.type = cfg.type;
+            cardInfo.imageId = cfg.imageId;
+            cardInfo.state = 0;
+            var obj = AddPrefab("ShouCard", xuanpaiPanel.transform.Find("List3/Viewport/Content"));
+            obj.GetComponent<ShouCard>().InitCardInfo(cardInfo);
+            paichiBossObj.Add(obj);
+        }
+        //随机特效
+        List<GameObject> random60 = GetRandomElementsBoss(60);
+        for (int i = 0; i < random60.Count; i++)
+        {
+            if (i < 15)
+            {
+                random60[i].GetComponent<ShouCard>().GetCardInfo().txState = 1;
+                Debug.Log(random60[i].GetComponent<ShouCard>().GetCardInfo().addId);
+            }
+            else if (i < 30)
+            {
+                random60[i].GetComponent<ShouCard>().GetCardInfo().txState = 2;
+            }
+            else if (i < 45)
+            {
+                random60[i].GetComponent<ShouCard>().GetCardInfo().txState = 3;
+            }
+            else if (i < 60)
+            {
+                random60[i].GetComponent<ShouCard>().GetCardInfo().txState = 4;
+            }
+            random60[i].GetComponent<ShouCard>().UpateTxImage();
+        }
+        List<GameObject> random30 = GetRandomElementsBoss(30);
+        foreach (var item in random30)
+        {
+            CardTxAndId cardTxAndId = new CardTxAndId();
+            cardTxAndId.id = item.GetComponent<ShouCard>().GetCardInfo().id;
+            cardTxAndId.txState = item.GetComponent<ShouCard>().GetCardInfo().txState;
+            paikuBoss.Add(cardTxAndId);
+        }
+      
     }
     //开始游戏
     public void BeginGame()
@@ -511,21 +658,7 @@ public class GameManager : MonoSingleton<GameManager>
         //读取牌组配置
         for (int i = 0; i < paikuPlayer.Count; i++)
         {
-            CardInfoCfg cfg = configMag.GetCardInfoCfgByKey(paikuPlayer[i]);
-            CardInfo cardInfo = new CardInfo();
-            cardInfo.addId = i;
-            cardInfo.id = cfg.ID;
-            cardInfo.xjNumber = cfg.xjNumber;
-            cardInfo.hpNumber = cfg.hpNumber;
-            cardInfo.gjNumber = cfg.gjNumber;
-            cardInfo.hpNumberNow = cfg.hpNumber;
-            cardInfo.gjNumberNow = cfg.gjNumber;
-            cardInfo.name = cfg.name;
-            cardInfo.type = cfg.type;
-            cardInfo.imageId = cfg.imageId;
-            cardInfo.state = 2;
-            bossCardList.Add(cardInfo);
-
+            CardInfoCfg cfg = configMag.GetCardInfoCfgByKey(paikuPlayer[i].id);
             CardInfo cardInfo2 = new CardInfo();
             cardInfo2.addId = 100 + i;
             cardInfo2.id = cfg.ID;
@@ -538,7 +671,26 @@ public class GameManager : MonoSingleton<GameManager>
             cardInfo2.type = cfg.type;
             cardInfo2.imageId = cfg.imageId;
             cardInfo2.state = 1;
+            cardInfo2.txState = paikuPlayer[i].txState;
             playerCardList.Add(cardInfo2);
+        }
+        for (int i = 0; i < paikuBoss.Count; i++)
+        {
+            CardInfoCfg cfg = configMag.GetCardInfoCfgByKey(paikuBoss[i].id);
+            CardInfo cardInfo = new CardInfo();
+            cardInfo.addId = i;
+            cardInfo.id = cfg.ID;
+            cardInfo.xjNumber = cfg.xjNumber;
+            cardInfo.hpNumber = cfg.hpNumber;
+            cardInfo.gjNumber = cfg.gjNumber;
+            cardInfo.hpNumberNow = cfg.hpNumber;
+            cardInfo.gjNumberNow = cfg.gjNumber;
+            cardInfo.name = cfg.name;
+            cardInfo.type = cfg.type;
+            cardInfo.imageId = cfg.imageId;
+            cardInfo.state = 2;
+            cardInfo.txState = paikuBoss[i].txState;
+            bossCardList.Add(cardInfo);
         }
         //打乱排序
         Util.shuffle<CardInfo>(bossCardList);
