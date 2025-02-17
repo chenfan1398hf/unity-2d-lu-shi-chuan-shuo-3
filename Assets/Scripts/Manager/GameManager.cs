@@ -334,8 +334,14 @@ public class GameManager : MonoSingleton<GameManager>
     }
 
     public MusicManager musicManager;
-    private List<int> paiku = new List<int> { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15 };
-    //private List<int> paiku = new List<int> {16,16,16,16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16 };
+    private List<int> paiChiPlayer = new List<int> { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15 };
+    private List<int> paikuChiBoss = new List<int> { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15 };
+    private List<GameObject> paichiPlayerObj = new List<GameObject>();
+    private List<int> randomElements;
+
+    private List<int> paikuPlayer = new List<int>();
+    private List<int> paikuBoss = new List<int>();
+
     private List<CardInfo> bossCardList = new List<CardInfo>();             //boss牌组
     private List<CardInfo> playerCardList = new List<CardInfo>();           //玩家牌组
 
@@ -357,10 +363,12 @@ public class GameManager : MonoSingleton<GameManager>
     private GameObject content3;                //BOSS手牌
     private GameObject content4;                //BOSS场牌
     private GameObject gamePanel;               //游戏panel节点
-    public GameObject beginPanel;
+    public GameObject xuanpaiPanel;             //选牌界面
+    public GameObject beginPanel;               //游戏开始界面
     public void InitGame()
     {
         BeginPanel(true);
+        xuanpaiPanel.SetActive(false);
         musicManager = new MusicManager();
         musicManager.PlayBkMusic("123");
         content1 = GameObject.Find("Canvas/Panel/List1/Viewport/Content").gameObject;
@@ -405,6 +413,38 @@ public class GameManager : MonoSingleton<GameManager>
 
         BeginPanel(true);
     }
+    public void XuanPaiBegin()
+    {
+        xuanpaiPanel.SetActive(true);
+        // 实例化所有牌
+        for (int i = 0; i < paiChiPlayer.Count; i++)
+        {
+            CardInfoCfg cfg = configMag.GetCardInfoCfgByKey(paiChiPlayer[i]);
+            CardInfo cardInfo = new CardInfo();
+            cardInfo.addId = i;
+            cardInfo.id = cfg.ID;
+            cardInfo.xjNumber = cfg.xjNumber;
+            cardInfo.hpNumber = cfg.hpNumber;
+            cardInfo.gjNumber = cfg.gjNumber;
+            cardInfo.hpNumberNow = cfg.hpNumber;
+            cardInfo.gjNumberNow = cfg.gjNumber;
+            cardInfo.name = cfg.name;
+            cardInfo.type = cfg.type;
+            cardInfo.imageId = cfg.imageId;
+            cardInfo.state = 0;
+            var obj = AddPrefab("ShouCard", xuanpaiPanel.transform.Find("List2/Viewport/Content"));
+            obj.GetComponent<ShouCard>().InitCardInfo(cardInfo);
+            paichiPlayerObj.Add(obj);
+        }
+        // 随机取出3个元素并从原列表删除
+        randomElements = Util.TakeAndRemoveRandomElements(paiChiPlayer, 3);
+        //改变父对象
+        for (int i = 0; i < randomElements.Count; i++)
+        {
+            paichiPlayerObj[randomElements[i]].transform.SetParent(xuanpaiPanel.transform.Find("List1/Viewport/Content"));
+        }
+
+    }
     //开始游戏
     public void BeginGame()
     {
@@ -423,9 +463,9 @@ public class GameManager : MonoSingleton<GameManager>
     {
         InitHero();
         //读取牌组配置
-        for (int i = 0; i < paiku.Count; i++)
+        for (int i = 0; i < paikuPlayer.Count; i++)
         {
-            CardInfoCfg cfg = configMag.GetCardInfoCfgByKey(paiku[i]);
+            CardInfoCfg cfg = configMag.GetCardInfoCfgByKey(paikuPlayer[i]);
             CardInfo cardInfo = new CardInfo();
             cardInfo.addId = i;
             cardInfo.id = cfg.ID;

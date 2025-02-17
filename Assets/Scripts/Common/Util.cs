@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using Spine.Unity;
@@ -172,7 +173,56 @@ public static class Util
     }
 
 
- 
+    /// <summary>
+    /// 从源列表中随机取出指定数量的元素，并从源列表中删除这些元素
+    /// </summary>
+    /// <param name="sourceList">源列表（将被修改）</param>
+    /// <param name="n">要取出的元素数量</param>
+    /// <returns>随机取出的元素列表</returns>
+    public static List<int> TakeAndRemoveRandomElements(List<int> sourceList, int n)
+    {
+        List<int> result = new List<int>();
+        if (sourceList == null || sourceList.Count == 0 || n <= 0)
+            return result;
+
+        // 计算实际要取的数量
+        int takeCount = Mathf.Min(n, sourceList.Count);
+
+        // 生成索引列表并洗牌
+        List<int> indexes = Enumerable.Range(0, sourceList.Count).ToList();
+        FisherYatesShuffle(indexes);
+
+        // 取出前N个洗牌后的索引
+        List<int> selectedIndexes = indexes.Take(takeCount).ToList();
+
+        // 按原始顺序收集结果
+        foreach (int index in selectedIndexes.OrderBy(x => x))
+        {
+            result.Add(sourceList[index]);
+        }
+
+        // 按倒序删除元素（避免索引变化问题）
+        foreach (int index in selectedIndexes.OrderByDescending(x => x))
+        {
+            sourceList.RemoveAt(index);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Fisher-Yates洗牌算法
+    /// </summary>
+    private static void FisherYatesShuffle<T>(IList<T> list)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+            int randomIndex = Random.Range(i, list.Count);
+            T temp = list[i];
+            list[i] = list[randomIndex];
+            list[randomIndex] = temp;
+        }
+    }
 
 
     #region 大额数值转换Numdispose(float tempNum_, int digits = 2)
