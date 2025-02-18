@@ -29,6 +29,9 @@ public class GameManager : MonoSingleton<GameManager>
     public static int TI_LI_MAX_NUMBER = 100;
     public static int TI_LI_CD_NUMBER = 600;
 
+    private int maxChangCardNumber = 2;
+    private int maxShouCardNumber = 8;
+
     #endregion
 
     private void Update()
@@ -368,6 +371,7 @@ public class GameManager : MonoSingleton<GameManager>
     private GameObject gamePanel;               //游戏panel节点
     public GameObject xuanpaiPanel;             //选牌界面
     public GameObject beginPanel;               //游戏开始界面
+    public GameObject msgPanel;                 //提示消息面板
     private int gameState = 0;                  //游戏阶段 0选牌阶段 1游戏阶段
     public void InitGame()
     {
@@ -383,6 +387,8 @@ public class GameManager : MonoSingleton<GameManager>
 
         heroObj = GameObject.Find("Canvas/Panel/ZhuJiao").gameObject;
         bossObj = GameObject.Find("Canvas/Panel/Boss").gameObject;
+
+        msgPanel.SetActive(true);
     }
     //结束游戏
     public void EndGame(int _winType)
@@ -834,13 +840,50 @@ public class GameManager : MonoSingleton<GameManager>
             var obj = AddPrefab("ShouCard", _fatherTransform);
             obj.GetComponent<ShouCard>().InitCardInfo(info);
             _list2.Add(obj);
+
+            if (_cardState == 3 && playerShouCardList.Count >= maxShouCardNumber)
+            {
+                _list2.Remove(obj);
+                obj.transform.SetParent(gamePanel.transform.Find("DesTag"));
+                StartCoroutine(DesDuoPai(obj));
+                Debug.Log("走多牌销毁逻辑");
+                return;
+            }
+            if (_cardState == 4 && bossShouCardList.Count >= maxShouCardNumber)
+            {
+                _list2.Remove(obj);
+                obj.transform.SetParent(gamePanel.transform.Find("DesTag"));
+                StartCoroutine(DesDuoPai(obj));
+                Debug.Log("走多牌销毁逻辑");
+                return;
+            }
         }
+    }
+    public IEnumerator DesDuoPai(GameObject _obj)
+    {
+        gamePanel.transform.Find("DesTag").GetComponent<RectTransform>().SetAsLastSibling();
+        RectTransform uiElement = _obj.GetComponent<RectTransform>();
+        Vector2 vec2 = new Vector2(900, 0);
+        _obj.transform.localPosition = vec2;
+        Vector2 vec2New = new Vector2(0, 0);
+        uiElement.DOAnchorPos(vec2New, 1f)
+                .SetEase(Ease.OutQuad); // 设置缓动效果
+        yield return new WaitForSeconds(1f);
+        AddPrefab("desCard", _obj.transform);
+        yield return new WaitForSeconds(0.5f);
+        Destroy(_obj);
     }
     //出牌
     public bool ChuCard(GameObject _obj, CardInfo _cardInfo)
     {
         if (cardPlayManager.GetXyNumber() < _cardInfo.xjNumber)
         {
+            return false;
+        }
+        //判断场牌数量
+        if (playerChangCardList.Count >= maxChangCardNumber)
+        {
+            GameManager.instance.MsgShow("场牌已满");
             return false;
         }
         //扣除心境值
@@ -878,6 +921,11 @@ public class GameManager : MonoSingleton<GameManager>
     public bool ChuPaiBoss(GameObject _obj, CardInfo _cardInfo)
     {
         if (cardPlayManager.GetXyNumber() < _cardInfo.xjNumber)
+        {
+            return false;
+        }
+        //判断场牌数量
+        if (bossChangCardList.Count >= maxChangCardNumber)
         {
             return false;
         }
@@ -1307,6 +1355,15 @@ public class GameManager : MonoSingleton<GameManager>
         }
         return false;
     }
-
+    //通用提示
+    public void MsgShow(string _msg)
+    {
+        msgPanel.transform.Find("Text (Legacy)").GetComponent<Text>().text = _msg;
+        DOVirtual.DelayedCall(3f,MyFunction);
+    }
+    void MyFunction()
+    {
+        msgPanel.transform.Find("Text (Legacy)").GetComponent<Text>().text = "";
+    }
 }
 
