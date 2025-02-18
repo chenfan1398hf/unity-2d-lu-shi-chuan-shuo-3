@@ -100,7 +100,7 @@ public class ShouCard : MonoBehaviour
         Debug.Log(this.transform.position.y);
         if (info.state == 3)
         {
-            if (this.transform.position.y >= 0f)
+            if (this.transform.position.y >= -2f)
             {
                 //³É¹¦
                 bool isBool = GameManager.instance.ChuCard(this.gameObject, info);
@@ -257,5 +257,13 @@ public class ShouCard : MonoBehaviour
         }
 
     }
-
+    //¼ì²é³°·í
+    public bool CheckCf()
+    {
+        if (info.txState == 1)
+        {
+            return true;
+        }
+        return false;
+    }
 }

@@ -1178,8 +1178,19 @@ public class GameManager : MonoSingleton<GameManager>
             beAttackObj = _obj;
             if (attackObj != null)
             {
-                Debug.Log("开始攻击");
-                StartCoroutine(AttackIEnumerator(attackObj, beAttackObj));
+                //检查嘲讽
+                if (CheckChaoFeng(bossChangCardList))
+                {
+                    //如果有嘲讽，要先判断是否被攻击obj 是不是嘲讽
+                    if (beAttackObj.GetComponent<ShouCard>().CheckCf())
+                    {
+                        StartCoroutine(AttackIEnumerator(attackObj, beAttackObj));
+                    }
+                }
+                else
+                {
+                    StartCoroutine(AttackIEnumerator(attackObj, beAttackObj));
+                }
             }
         }
     }
@@ -1273,6 +1284,23 @@ public class GameManager : MonoSingleton<GameManager>
         // 在发布的应用程序中，使用 Application.Quit() 方法来退出游戏
         Application.Quit();
 #endif
+    }
+    //检查场牌是否有嘲讽牌
+    public bool CheckChaoFeng(List<GameObject> _list)
+    {
+        bool isBool = false;
+        if (_list.Count <= 0)
+        {
+            return isBool;
+        }
+        foreach (var item in _list)
+        {
+            if (item.GetComponent<ShouCard>().CheckCf())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }
 
