@@ -1273,6 +1273,12 @@ public class GameManager : MonoSingleton<GameManager>
         var obj = AddPrefab("ShengDunTx", _trs);
         return obj;
     }
+    //复活特效
+    public GameObject FHTx(Transform _trs)
+    {
+        var obj = AddPrefab("fuhuo", _trs);
+        return obj;
+    }
     // 退出游戏的方法
     public void Quit()
     {

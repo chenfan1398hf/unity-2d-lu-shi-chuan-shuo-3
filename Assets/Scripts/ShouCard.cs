@@ -199,6 +199,7 @@ public class ShouCard : MonoBehaviour
             {
                 info.hpNumberNow = 1;
                 isAiType = false;
+                GameManager.instance.FHTx(this.gameObject.transform);
                 ShowCrad();
             }
             else
