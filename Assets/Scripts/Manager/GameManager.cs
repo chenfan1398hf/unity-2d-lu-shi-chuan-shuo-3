@@ -871,7 +871,7 @@ public class GameManager : MonoSingleton<GameManager>
             Destroy(_obj);
         }
 
-        ChuPaiTeXiao(_cardInfo.xjType, 1, _obj);
+        //ChuPaiTeXiao(_cardInfo.xjType, 1, _obj);
         return true;
     }
     //Boss出牌
@@ -911,7 +911,7 @@ public class GameManager : MonoSingleton<GameManager>
         //刷新牌背
         _obj.GetComponent<ShouCard>().UpdateCardBack();
 
-        ChuPaiTeXiao(_cardInfo.xjType, 2, _obj);
+        //ChuPaiTeXiao(_cardInfo.xjType, 2, _obj);
         return true;
     }
     //特效牌效果

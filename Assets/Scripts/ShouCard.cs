@@ -41,10 +41,10 @@ public class ShouCard : MonoBehaviour
         info = _info;
      
         //¿÷
-        if (info.xjType == 4)
-        {
-            info.xjNumber = 0;
-        }
+        //if (info.xjType == 4)
+        //{
+        //    info.xjNumber = 0;
+        //}
       
         ShowCrad();
     }
