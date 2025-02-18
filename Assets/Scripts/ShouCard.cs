@@ -78,7 +78,7 @@ public class ShouCard : MonoBehaviour
         }
         else if (info.state == 6)
         {
-            this.transform.Find("Image_tx").gameObject.SetActive(true);
+            UpateTxImage();
         }
     }
     //Íæ¼ÒÍÏ¶¯ÅÆ
@@ -248,13 +248,14 @@ public class ShouCard : MonoBehaviour
     {
         if (info.txState == 0)
         {
-            txImage.gameObject.SetActive(false);
+            this.transform.Find("Image_tx").gameObject.SetActive(false);
         }
         else
         {
-            txImage.gameObject.SetActive(true);
+            this.transform.Find("Image_tx").gameObject.SetActive(true);
+            GameManager.instance.SpritPropImageByPath("Tex/" + info.txState.ToString(), txImage);
         }
-        GameManager.instance.SpritPropImageByPath("Tex/"+info.txState.ToString(), txImage);
+
     }
 
 }

@@ -624,7 +624,10 @@ public class GameManager : MonoSingleton<GameManager>
             {
                 random60[i].GetComponent<ShouCard>().GetCardInfo().txState = 4;
             }
-            random60[i].GetComponent<ShouCard>().UpateTxImage();
+        }
+        for (int i = 0; i < paichiBossObj.Count; i++)
+        {
+            paichiBossObj[i].GetComponent<ShouCard>().UpateTxImage();
         }
         List<GameObject> random30 = GetRandomElementsBoss(30);
         foreach (var item in random30)
@@ -878,6 +881,7 @@ public class GameManager : MonoSingleton<GameManager>
         {
             return false;
         }
+        _obj.GetComponent<ShouCard>().UpateTxImage();
         //¿Û³ýÐÄ¾³Öµ
         cardPlayManager.AddXjNumber(-_cardInfo.xjNumber);
         if (_cardInfo.type == 0)
