@@ -17,6 +17,7 @@ public class ShouCard : MonoBehaviour
     private bool isNuType = false;
     private bool isAiType = false;
     public bool isLeType = false;
+    private bool isShengDun = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -148,6 +149,11 @@ public class ShouCard : MonoBehaviour
     //增加血量
     public void addHpNumber(int _number, bool isColor =false)
     {
+        if (isShengDun && _number < 0)
+        {
+            isShengDun = false;
+            return;
+        }
         info.hpNumberNow += _number;
         ShowCrad();
         if (isColor)
@@ -157,6 +163,10 @@ public class ShouCard : MonoBehaviour
         if (_number > 0)
         {
             GameManager.instance.HpTx(this.transform);
+        }
+        if (_number < 0 && info.hpNumberNow > 0)
+        {
+            CheckXiXue(-_number);
         }
     }
     //增加攻击
@@ -182,7 +192,7 @@ public class ShouCard : MonoBehaviour
         {
             if (isAiType)
             {
-                info.hpNumberNow = info.hpNumber;
+                info.hpNumberNow = 1;
                 isAiType = false;
                 ShowCrad();
             }
@@ -243,6 +253,11 @@ public class ShouCard : MonoBehaviour
         isLeType = true;
 
     }
+    //圣盾
+    public void SetSdType()
+    {
+        isShengDun = true;
+    }
     //刷新特效
     public void UpateTxImage()
     {
@@ -265,5 +280,22 @@ public class ShouCard : MonoBehaviour
             return true;
         }
         return false;
+    }
+    //吸血逻辑检查
+    public void CheckXiXue(int _number)
+    {
+        if (info.txState == 3)
+        {
+            info.hpNumberNow += _number;
+            if (info.hpNumberNow > info.hpNumber)
+            {
+                info.hpNumberNow = info.hpNumber;
+            }
+            ShowCrad();
+            if (_number > 0)
+            {
+                GameManager.instance.HpTx(this.transform);
+            }
+        }
     }
 }

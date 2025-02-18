@@ -871,7 +871,7 @@ public class GameManager : MonoSingleton<GameManager>
             Destroy(_obj);
         }
 
-        //ChuPaiTeXiao(_cardInfo.xjType, 1, _obj);
+        ChuPaiTeXiao(_cardInfo.txState, 1, _obj);
         return true;
     }
     //Boss出牌
@@ -911,7 +911,7 @@ public class GameManager : MonoSingleton<GameManager>
         //刷新牌背
         _obj.GetComponent<ShouCard>().UpdateCardBack();
 
-        //ChuPaiTeXiao(_cardInfo.xjType, 2, _obj);
+        ChuPaiTeXiao(_cardInfo.txState, 2, _obj);
         return true;
     }
     //特效牌效果
@@ -928,26 +928,20 @@ public class GameManager : MonoSingleton<GameManager>
         }
         if (_xjType == 1)
         {
-            //喜（给场牌加BUFF +2血量）
-            foreach (var item in list)
-            {
-                item.GetComponent<ShouCard>().addHpNumber(2,true);
-            }
+         
         }
         else if (_xjType == 2)
         {
-            //怒（攻击翻倍 每回合掉血）
-            _obj.GetComponent<ShouCard>().NuType();
+            //（复活）
+           _obj.GetComponent<ShouCard>().AiType();
         }
         else if (_xjType == 3)
         {
-            //哀（复活）
-            _obj.GetComponent<ShouCard>().AiType();
+         
         }
         else if (_xjType == 4)
         {
-            //乐（无消耗）
-            _obj.GetComponent<ShouCard>().LeType();
+           _obj.GetComponent<ShouCard>().SetSdType();
         }
     }
     //拖拽牌设置父节点
@@ -1271,8 +1265,7 @@ public class GameManager : MonoSingleton<GameManager>
     //攻击特效
     public void GjTx(Transform _trs)
     {
-        var obj = AddPrefab("gj", _trs);
-
+        //var obj = AddPrefab("gj", _trs);
     }
     // 退出游戏的方法
     public void Quit()
@@ -1295,12 +1288,13 @@ public class GameManager : MonoSingleton<GameManager>
         }
         foreach (var item in _list)
         {
-            if (item.GetComponent<ShouCard>().CheckCf())
+            if (item.GetComponent<ShouCard>().CheckCf() && item.GetComponent<ShouCard>().GetCardInfo().hpNumberNow > 0)
             {
                 return true;
             }
         }
         return false;
     }
+
 }
 
