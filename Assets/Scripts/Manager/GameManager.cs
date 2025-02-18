@@ -1267,6 +1267,12 @@ public class GameManager : MonoSingleton<GameManager>
     {
         //var obj = AddPrefab("gj", _trs);
     }
+    //圣盾特效
+    public GameObject SDTx(Transform _trs)
+    {
+        var obj = AddPrefab("ShengDunTx", _trs);
+        return obj;
+    }
     // 退出游戏的方法
     public void Quit()
     {

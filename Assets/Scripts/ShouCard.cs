@@ -18,6 +18,7 @@ public class ShouCard : MonoBehaviour
     private bool isAiType = false;
     public bool isLeType = false;
     private bool isShengDun = false;
+    private GameObject sdObj = null;
     // Start is called before the first frame update
     void Start()
     {
@@ -152,6 +153,10 @@ public class ShouCard : MonoBehaviour
         if (isShengDun && _number < 0)
         {
             isShengDun = false;
+            if (sdObj != null)
+            {
+                Destroy(sdObj);
+            }
             return;
         }
         info.hpNumberNow += _number;
@@ -257,6 +262,7 @@ public class ShouCard : MonoBehaviour
     public void SetSdType()
     {
         isShengDun = true;
+        sdObj = GameManager.instance.SDTx(this.gameObject.transform);
     }
     //Ë¢ÐÂÌØÐ§
     public void UpateTxImage()
