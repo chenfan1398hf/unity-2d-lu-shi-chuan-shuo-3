@@ -31,6 +31,8 @@ public class CardPlayManager
     private int hhNumber = 0;       //当前回合数
     private int endTime = 30;       //回合结束时间
     private int xyNumber = 0;       //本局剩余心愿数量
+    private int boosKouXueNumber = 0;
+    private int playerKouXueNumber = 0;
 
 
     //初始化数据
@@ -123,7 +125,33 @@ public class CardPlayManager
         GameManager.instance.AddBossShouCard(number);
         GameManager.instance.AddPlayerShouCard(number);
     }
-  
+    //获得无牌扣血数量
+    public int GetWuPaiKouXueNumber(int _operand)
+    {
+        SetWuPaiKouXueNumber(_operand);
+        if (_operand == 1)
+        {
+            return playerKouXueNumber;
+        }
+        else if (true)
+        {
+            return boosKouXueNumber;
+        }
+    }
+    //增加扣血量
+    public void SetWuPaiKouXueNumber(int _operand)
+    {
+        if (_operand == 1)
+        {
+            playerKouXueNumber++;
+        }
+        else if (true)
+        {
+            boosKouXueNumber++;
+        }
+    }
+
+
 }
 public class CardTxAndId
 {

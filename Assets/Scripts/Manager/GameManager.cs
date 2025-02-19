@@ -29,7 +29,7 @@ public class GameManager : MonoSingleton<GameManager>
     public static int TI_LI_MAX_NUMBER = 100;
     public static int TI_LI_CD_NUMBER = 600;
 
-    private int maxChangCardNumber = 2;
+    private int maxChangCardNumber = 5;
     private int maxShouCardNumber = 8;
 
     #endregion
@@ -832,7 +832,22 @@ public class GameManager : MonoSingleton<GameManager>
         {
             if (_list1.Count <= 0)
             {
-                return;
+                //ÎÞÅÆ¿ÛÑªÂß¼­
+                if (_cardState == 3)
+                {
+                    //Íæ¼ÒÎÞÅÆ
+                    int number = cardPlayManager.GetWuPaiKouXueNumber(1);
+                    heroObj.GetComponent<ShouCard>().addHpNumber(-number);
+                    MsgShow("Æ£ÀÍ¿Û³ýÑªÁ¿"+ number);
+                }
+                else
+                {
+                    //bossÎÞÅÆ
+                    int number = cardPlayManager.GetWuPaiKouXueNumber(2);
+                    bossObj.GetComponent<ShouCard>().addHpNumber(-number);
+                    MsgShow("Æ£ÀÍ¿Û³ýÑªÁ¿" + number);
+                }
+                continue;
             }
             CardInfo info = _list1.First();
             info.state = _cardState;
@@ -858,6 +873,7 @@ public class GameManager : MonoSingleton<GameManager>
                 return;
             }
         }
+        UpdateCardNumberShow();
     }
     public IEnumerator DesDuoPai(GameObject _obj)
     {
@@ -1364,6 +1380,12 @@ public class GameManager : MonoSingleton<GameManager>
     void MyFunction()
     {
         msgPanel.transform.Find("Text (Legacy)").GetComponent<Text>().text = "";
+    }
+    //Ë¢ÐÂÊ£Óà¿¨ÅÆÊý
+    public void UpdateCardNumberShow()
+    {
+        gamePanel.transform.Find("Text_player_car_number").GetComponent<Text>().text = playerCardList.Count.ToString();
+        gamePanel.transform.Find("Text_boss_car_number").GetComponent<Text>().text = bossCardList.Count.ToString();
     }
 }
 

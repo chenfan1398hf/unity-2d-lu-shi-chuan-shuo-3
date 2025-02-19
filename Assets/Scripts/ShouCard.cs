@@ -173,6 +173,7 @@ public class ShouCard : MonoBehaviour
         {
             CheckXiXue(-_number);
         }
+        CheckHp();
     }
     //Ôö¼Ó¹¥»÷
     public void addGjNumber(int _number, bool isColor = false)
