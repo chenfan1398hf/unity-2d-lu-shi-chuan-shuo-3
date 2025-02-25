@@ -372,6 +372,7 @@ public class GameManager : MonoSingleton<GameManager>
     public GameObject xuanpaiPanel;             //选牌界面
     public GameObject beginPanel;               //游戏开始界面
     public GameObject msgPanel;                 //提示消息面板
+    public GameObject jieshaoPanel;             //游戏介绍面板
     private int gameState = 0;                  //游戏阶段 0选牌阶段 1游戏阶段
     public void InitGame()
     {
@@ -1386,6 +1387,11 @@ public class GameManager : MonoSingleton<GameManager>
     {
         gamePanel.transform.Find("Text_player_car_number").GetComponent<Text>().text = playerCardList.Count.ToString();
         gamePanel.transform.Find("Text_boss_car_number").GetComponent<Text>().text = bossCardList.Count.ToString();
+    }
+    //开启游戏介绍界面
+    public void OpenJieShaoPanel()
+    {
+        jieshaoPanel.SetActive(true);
     }
 }
 
