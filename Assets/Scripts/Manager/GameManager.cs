@@ -1102,12 +1102,19 @@ public class GameManager : MonoSingleton<GameManager>
                             list.Add(jtem);
                         }
                     }
-                    //随机攻击
+                    //攻击
                     if (list.Count > 0)
                     {
-                        int randNumber = Util.randomInt(0, list.Count - 1);
-                        StartCoroutine(AttackIEnumerator(item, list[randNumber]));
-                        yield return new WaitForSeconds(2f);
+                        GameObject obj = GetAiAttackObj(list);
+                        if (obj != null)
+                        {
+                            StartCoroutine(AttackIEnumerator(item, obj));
+                            yield return new WaitForSeconds(2f);
+                        }
+                        else
+                        {
+                            Debug.LogError("数据异常");
+                        }
                     }
                     else
                     {
@@ -1129,6 +1136,48 @@ public class GameManager : MonoSingleton<GameManager>
 
         yield return new WaitForSeconds(1f);
 
+    }
+    //获取攻击目标
+    public GameObject GetAiAttackObj(List<GameObject> _list)
+    {
+        if (_list.Count <= 0)
+        {
+            return null;
+        }
+        foreach (var item in _list)
+        {
+            var info = item.GetComponent<ShouCard>().GetCardInfo();
+            if (info.txState == 1)
+            {
+                return item;
+            }
+        }
+        foreach (var item in _list)
+        {
+            var info = item.GetComponent<ShouCard>().GetCardInfo();
+            if (info.txState == 2)
+            {
+                return item;
+            }
+        }
+        foreach (var item in _list)
+        {
+            var info = item.GetComponent<ShouCard>().GetCardInfo();
+            if (info.txState == 4)
+            {
+                return item;
+            }
+        }
+        foreach (var item in _list)
+        {
+            var info = item.GetComponent<ShouCard>().GetCardInfo();
+            if (info.txState == 3)
+            {
+                return item;
+            }
+        }
+        int randNumber = Util.randomInt(0, _list.Count - 1);
+        return _list[randNumber];
     }
     //获取当前手牌里心境最高的牌
     public GameObject GetMaxXjCard()
@@ -1257,7 +1306,7 @@ public class GameManager : MonoSingleton<GameManager>
     {
         Vector3 oldVec = _attack0bj.transform.position;
         Vector3 mubiaoVec = _beAttack0bj.transform.Find("BiaoJi").transform.position;
-        _attack0bj.transform.DOMove(mubiaoVec, 0.3f)
+        _attack0bj.transform.DOMove(mubiaoVec, 0.2f)
           .SetEase(Ease.InOutQuad);// 设置缓动函数
         yield return new WaitForSeconds(0.4f);
         AttackTx(mubiaoVec);
