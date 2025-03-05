@@ -482,6 +482,7 @@ public class GameManager : MonoSingleton<GameManager>
         for (int i = 0; i < randomElements.Count; i++)
         {
             randomElements[i].transform.SetParent(xuanpaiPanel.transform.Find("List1/Viewport/Content"));
+            randomElements[i].transform.localScale = Vector3.one;
         }
 
     }
