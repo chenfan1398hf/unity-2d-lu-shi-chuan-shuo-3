@@ -644,15 +644,86 @@ public class GameManager : MonoSingleton<GameManager>
         {
             paichiBossObj[i].GetComponent<ShouCard>().UpateTxImage();
         }
-        List<GameObject> random30 = GetRandomElementsBoss(30);
-        foreach (var item in random30)
+        //List<GameObject> random30 = GetRandomElementsBoss(30);
+        //foreach (var item in random30)
+        //{
+        //    CardTxAndId cardTxAndId = new CardTxAndId();
+        //    cardTxAndId.id = item.GetComponent<ShouCard>().GetCardInfo().id;
+        //    cardTxAndId.txState = item.GetComponent<ShouCard>().GetCardInfo().txState;
+        //    paikuBoss.Add(cardTxAndId);
+        //}
+        for (int i = 0; i < 30; i++)
         {
+            randomElements = RandCardObj(paichiBossObj, 3);
+            var obj = BossAiXuanPai(randomElements);
+
             CardTxAndId cardTxAndId = new CardTxAndId();
-            cardTxAndId.id = item.GetComponent<ShouCard>().GetCardInfo().id;
-            cardTxAndId.txState = item.GetComponent<ShouCard>().GetCardInfo().txState;
+            cardTxAndId.id = obj.GetComponent<ShouCard>().GetCardInfo().id;
+            cardTxAndId.txState = obj.GetComponent<ShouCard>().GetCardInfo().txState;
             paikuBoss.Add(cardTxAndId);
         }
-      
+
+
+    }
+    //BOSS选牌AI
+    public GameObject BossAiXuanPai(List<GameObject> _list)
+    {
+        List<CardQuanZhongInfo> qzList = new List<CardQuanZhongInfo>();
+        for (int i = 1; i < 5; i++)
+        {
+            CardQuanZhongInfo cardQuan = new CardQuanZhongInfo();
+            cardQuan.txState = i;
+            if (i == 1)
+            {
+                cardQuan.qzNumber = 4;
+            }
+            else if (i == 2)
+            {
+                cardQuan.qzNumber = 1;
+            }
+            else if (i == 3)
+            {
+                cardQuan.qzNumber = 2;
+            }
+            else if (i == 4)
+            {
+                cardQuan.qzNumber = 3;
+            }
+            qzList.Add(cardQuan);
+        }
+        qzList[0].haveNumber = GetTxNumber(1);
+        qzList[1].haveNumber = GetTxNumber(2);
+        qzList[2].haveNumber = GetTxNumber(3);
+        qzList[3].haveNumber = GetTxNumber(4);
+
+        var sortedList = qzList.OrderBy(c => c.haveNumber)
+                     .ThenByDescending(c => c.qzNumber)
+                     .ToList();
+
+        foreach (var item in sortedList)
+        {
+            foreach (var jtem in _list)
+            {
+                if (item.txState == jtem.GetComponent<ShouCard>().GetCardInfo().txState)
+                {
+                    return jtem;
+                }
+            }
+        }
+        return _list[0];
+    }
+    //获取选牌有多少张特效牌
+    public int GetTxNumber(int _txState)
+    {
+        int iRet = 0;
+        foreach (var item in paikuBoss)
+        {
+            if (item.txState == _txState)
+            {
+                iRet++;
+            }
+        }
+        return iRet;
     }
     //开始游戏
     public void BeginGame()

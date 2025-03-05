@@ -158,3 +158,9 @@ public class CardTxAndId
     public int id;
     public int txState;
 }
+public class CardQuanZhongInfo
+{
+    public int txState = 0;
+    public int qzNumber = 0;
+    public int haveNumber = 0;
+}
