@@ -373,6 +373,7 @@ public class GameManager : MonoSingleton<GameManager>
     public GameObject beginPanel;               //游戏开始界面
     public GameObject msgPanel;                 //提示消息面板
     public GameObject jieshaoPanel;             //游戏介绍面板
+    public GameObject endPanel;                 //游戏结束面板
     private int gameState = 0;                  //游戏阶段 0选牌阶段 1游戏阶段
     public void InitGame()
     {
@@ -390,13 +391,14 @@ public class GameManager : MonoSingleton<GameManager>
         bossObj = GameObject.Find("Canvas/Panel/Boss").gameObject;
 
         msgPanel.SetActive(true);
+        endPanel.SetActive(false);
     }
     //结束游戏
     public void EndGame(int _winType)
     {
         if (_winType == 1)
         {
-            playerData.playerLevel++;
+            //playerData.playerLevel++;
         }
         bossCardList.Clear();
         playerCardList.Clear();
@@ -422,6 +424,11 @@ public class GameManager : MonoSingleton<GameManager>
         bossChangCardList.Clear();
         playerChangCardList.Clear();
 
+        paikuPlayer.Clear();
+        paikuBoss.Clear();
+
+        gameState = 0;
+        endPanel.SetActive(true);
         BeginPanel(true);
     }
     public void XuanPaiBegin(bool isBool = true)
@@ -708,7 +715,7 @@ public class GameManager : MonoSingleton<GameManager>
         Util.shuffle<CardInfo>(playerCardList);
 
         //随机牌组的心境类型
-        RandXjType();
+        //RandXjType();
     }
     //初始化英雄数据
     public void InitHero()
