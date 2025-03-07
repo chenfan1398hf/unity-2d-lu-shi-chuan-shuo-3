@@ -1152,9 +1152,9 @@ public class GameManager : MonoSingleton<GameManager>
     public IEnumerator BossPlayerCard()
     {
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 5; i++)
         {
-            var obj = GetMaxXjCard();
+            var obj = GetTxXjCard();
             if (obj == null)
             {
                 yield return new WaitForSeconds(1f);
@@ -1281,6 +1281,44 @@ public class GameManager : MonoSingleton<GameManager>
         {
             return bossShouCardList[maxIndex];
         }
+    }
+    //按特效出牌
+    public GameObject GetTxXjCard()
+    {
+        int haveXj = cardPlayManager.GetXyNumber();
+        for (int i = 0; i < bossShouCardList.Count; i++)
+        {
+            var info = bossShouCardList[i].GetComponent<ShouCard>().GetCardInfo();
+            if (info.txState == 1 && haveXj >= info.xjNumber)
+            {
+                return bossShouCardList[i];
+            }
+        }
+        for (int i = 0; i < bossShouCardList.Count; i++)
+        {
+            var info = bossShouCardList[i].GetComponent<ShouCard>().GetCardInfo();
+            if (info.txState == 4 && haveXj >= info.xjNumber)
+            {
+                return bossShouCardList[i];
+            }
+        }
+        for (int i = 0; i < bossShouCardList.Count; i++)
+        {
+            var info = bossShouCardList[i].GetComponent<ShouCard>().GetCardInfo();
+            if (info.txState == 3 && haveXj >= info.xjNumber)
+            {
+                return bossShouCardList[i];
+            }
+        }
+        for (int i = 0; i < bossShouCardList.Count; i++)
+        {
+            var info = bossShouCardList[i].GetComponent<ShouCard>().GetCardInfo();
+            if (info.txState == 2 && haveXj >= info.xjNumber)
+            {
+                return bossShouCardList[i];
+            }
+        }
+        return GetMaxXjCard();
     }
     //存在回合数增加
     public void AddLiveHh(int _type)
