@@ -482,7 +482,7 @@ public class GameManager : MonoSingleton<GameManager>
             }
         }
 
-       
+
         // 随机取出3个元素并从原列表删除
         randomElements = RandCardObj(paichiPlayerObj, 3);
         //改变父对象
@@ -918,7 +918,7 @@ public class GameManager : MonoSingleton<GameManager>
                     //玩家无牌
                     int number = cardPlayManager.GetWuPaiKouXueNumber(1);
                     heroObj.GetComponent<ShouCard>().addHpNumber(-number);
-                    MsgShow("疲劳扣除血量"+ number);
+                    MsgShow("疲劳扣除血量" + number);
                 }
                 else
                 {
@@ -1072,20 +1072,20 @@ public class GameManager : MonoSingleton<GameManager>
         }
         if (_xjType == 1)
         {
-         
+
         }
         else if (_xjType == 2)
         {
             //（复活）
-           _obj.GetComponent<ShouCard>().AiType();
+            _obj.GetComponent<ShouCard>().AiType();
         }
         else if (_xjType == 3)
         {
-         
+
         }
         else if (_xjType == 4)
         {
-           _obj.GetComponent<ShouCard>().SetSdType();
+            _obj.GetComponent<ShouCard>().SetSdType();
         }
     }
     //拖拽牌设置父节点
@@ -1216,6 +1216,20 @@ public class GameManager : MonoSingleton<GameManager>
         yield return new WaitForSeconds(1f);
 
     }
+    public bool GetMaxGjAndPlayerHp()
+    {
+        int maxGj = 0;
+        foreach (var item in bossChangCardList)
+        {
+            maxGj += item.GetComponent<ShouCard>().GetCardInfo().gjNumberNow;
+        }
+        int playerHp = heroObj.GetComponent<ShouCard>().GetCardInfo().hpNumberNow;
+        if (maxGj >= playerHp)
+        {
+            return true;
+        }
+        return false;
+    }
     //获取攻击目标
     public GameObject GetAiAttackObj(List<GameObject> _list)
     {
@@ -1230,6 +1244,10 @@ public class GameManager : MonoSingleton<GameManager>
             {
                 return item;
             }
+        }
+        if (GameManager.instance.GetMaxGjAndPlayerHp())
+        {
+            return heroObj;
         }
         foreach (var item in _list)
         {
