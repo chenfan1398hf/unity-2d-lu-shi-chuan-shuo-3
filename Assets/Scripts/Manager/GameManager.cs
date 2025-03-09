@@ -392,6 +392,7 @@ public class GameManager : MonoSingleton<GameManager>
 
         msgPanel.SetActive(true);
         endPanel.SetActive(false);
+        ChangYL();
     }
     //结束游戏
     public void EndGame(int _winType)
@@ -1576,6 +1577,21 @@ public class GameManager : MonoSingleton<GameManager>
     public void OpenJieShaoPanel()
     {
         jieshaoPanel.SetActive(true);
+    }
+    //修改音量
+    public Slider volumeSlider;
+    public void ChangYL()
+    {
+        if (volumeSlider != null)
+        {
+            // 为Slider的OnValueChanged事件添加监听器
+            volumeSlider.onValueChanged.AddListener(SetVolume);
+        }
+    }
+    void SetVolume(float volume)
+    {
+        // 设置AudioSource的音量为Slider的值
+        musicManager.ChangeBkValue(volume);
     }
 }
 
